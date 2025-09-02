@@ -1,0 +1,205 @@
+# Reproducibility
+seed: 42
+
+# Environment
+env_name: GreenhouseEnv
+max_steps: 23
+time_resolution: 2016       # timesteps per episode window (flattened)
+obs_shapes:
+  weather: [2016, 10]
+  crop_params: [1, 3]
+  resource_consumption: [1, 5]
+  gh_climate: [2016, 10]
+actions:
+  count: 9
+  names: [co2_vip, int_white_vip, pH_drain_PC, scr_blck_vip, scr_enrg_vip, t_heat_vip, t_ventlee_vip, water_sup, water_sup_intervals_vip_min]
+  normalized: true          # actions are in [0,1]
+days_feature:
+  enabled: true
+  scale: 166.0
+
+# Paths (edit to your local / repo copies)
+paths:
+  crop_parameters_estimator: ./models/weights/wcp_LSTM_model_fs_model.h5
+  resource_consumption_estimator: ./models/weights/rc_LSTM_model_fs_model.h5
+  gh_climate_estimator: ./models/weights/ghc_mlp_model_fs_model.h5
+  weather_csv: ./data/minimal_dataset/weather_fill_missing_values.csv
+
+scaling:
+  weather: MinMaxScaler
+  clip: false
+
+# =========================
+# Reward configuration
+# =========================
+reward:
+  # Active profile 
+  profile_active: "equal_weights_v1"
+
+  profiles:
+
+    equal_weights_v1:
+      alpha: 1.0    # crop term weight
+      beta:  1.0    # resource term weight
+      # The following are defined but not added in the current reward; keep for future toggles
+      delta: 0.02   # efficiency bonus weight (crop/(1+resource))  -- currently inactive
+      gamma: 0.002  # stability (action variation) penalty         -- currently inactive
+
+      crop_component:
+        weights: [1.0, 1.0, 1.0]                  # w1, w2, w3
+        max_vals: [1.0, 1.0, 1.0]                  # normalization caps
+
+      resource_component:
+        # heat, co2, electricity(hi+low), irrigation
+        weights: [1.0, 1.0, 1.0, 1.0]              # p1, p2, p3, p4
+        max_vals: [7.0, 7.0, 7.0, 7.0]
+
+      thresholds:
+        resource_cap: 7.0
+        crop_any_low: 0.5
+        crop_any_high: [0.7, 0.8]
+        crop_all_high: [0.5, 0.7, 0.8]
+
+      extras:
+        penalties:
+          any_resource_gt_cap: -1.0
+          any_crop_lt_crop_any_low: -0.8
+          all_crops_lt_crop_any_low: -1.0
+        bonuses:
+          any_crop_ge:
+            "0.7": 0.5
+            "0.8": 0.8
+          all_crops_ge:
+            "0.5": 0.8
+            "0.7": 0.8
+            "0.8": 1.0
+
+      use_efficiency_term: false   # toggle to add delta * (crop/(1+resource))
+      use_stability_term:  false   # toggle to add - gamma * stability
+
+    # Optional commented profile to reflect alternative block (for sensitivity analysis)
+    yield_priority_v1:
+      alpha: 1.0
+      beta:  0.2
+      delta: 0.10
+      gamma: 0.01
+      crop_component:
+        weights: [0.40, 0.30, 0.30]
+        max_vals: [1.0, 1.0, 1.0]
+      resource_component:
+        weights: [0.2, 0.3, 0.2, 0.3]
+        max_vals: [7.0, 7.0, 7.0, 7.0]
+      thresholds:
+        resource_cap: 7.0
+        crop_any_low: 0.5
+        crop_any_high: [0.7, 0.8]
+        crop_all_high: [0.5, 0.7, 0.8]
+      extras:
+        penalties:
+          any_resource_gt_cap: -1.0
+          any_crop_lt_crop_any_low: -0.8
+          all_crops_lt_crop_any_low: -1.0
+        bonuses:
+          any_crop_ge:
+            "0.7": 0.2
+            "0.8": 0.2
+          all_crops_ge:
+            "0.5": 0.2
+            "0.7": 0.2
+            "0.8": 0.2
+      use_efficiency_term: false
+      use_stability_term:  false
+
+# =========================
+# TD3 hyperparameters
+# =========================
+td3:
+  policy: MultiInputPolicy
+  learning_rate: 1.0e-4
+  buffer_size: 100
+  batch_size: 256
+  tau: 0.005
+  gamma: 0.99
+  train_freq:
+    n: 1
+    unit: episode
+  gradient_steps: 100
+  learning_starts: 1000
+  policy_delay: 2
+  target_policy_noise: 0.2
+  target_noise_clip: 0.5
+  action_noise:
+    type: Normal
+    sigma: 0.1
+  policy_kwargs:
+    net_arch: [256, 256, 128]
+  device: auto
+  tensorboard_log: ./TD3_logs_fs
+  monitor_log: ./TD3_logs_fs/monitor.csv
+
+# =========================
+# PPO hyperparameters
+# =========================
+ppo:
+  policy: MultiInputPolicy
+  learning_rate: 1.0e-5
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 20
+  gamma: 0.99
+  clip_range: 0.2
+  ent_coef: 0.05
+  gae_lambda: 0.95
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  tensorboard_log: ./PPO_logs
+  policy_kwargs:
+    net_arch: [256, 256, 128]
+  device: auto
+  monitor_log: ./PPO_logs_fs/monitor.csv
+# =========================
+# SAC hyperparameters
+# =========================
+sac:
+  policy: MultiInputPolicy
+  learning_rate: 3.0e-4
+  buffer_size: 10000
+  batch_size: 16
+  tau: 0.005
+  gamma: 0.99
+  train_freq:
+    n: 1
+    unit: episode
+  gradient_steps: 100
+  learning_starts: 10000
+  ent_coef: auto
+  target_update_interval: 1
+  policy_kwargs:
+    net_arch: [400, 300]
+  tensorboard_log: ./SAC_logs
+  device: cuda
+  monitor_log: ./SAC_logs_fs/monitor.csv
+# =========================
+# DDPG hyperparameters
+# =========================
+ddpg:
+  policy: MultiInputPolicy
+  learning_rate: 1.0e-3
+  buffer_size: 10000
+  batch_size: 128
+  tau: 0.005
+  gamma: 0.98
+  train_freq:
+    n: 1
+    unit: episode
+  gradient_steps: 100
+  learning_starts: 0
+  action_noise:
+    type: OrnsteinUhlenbeck
+    sigma: 0.2
+    theta: 0.15
+  policy_kwargs:
+    net_arch: [400, 300]
+  tensorboard_log: ./DDPG_logs
+  device: cuda
+  monitor_log: ./DDPG_logs_fs/monitor.csv

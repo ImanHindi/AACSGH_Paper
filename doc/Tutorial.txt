@@ -1,0 +1,208 @@
+AACSGH_Paper
+
+Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques
+
+This repository provides the minimal dataset, pretrained models, and code required to reproduce the results and figures of our manuscript:
+
+Hindi, I., Alsharkawi, A., Al Ajlouni, M., et al. (2025). Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques. PLOS ONE.
+
+📂 Repository Layout
+AACSGH_Paper/
+├─ README.md
+├─ docs/
+│  └─ TUTORIAL.md
+├─ configs/
+│  └─ paper.yaml              # Hyper-params & reward weights
+├─ data/
+│  ├─ README_DATASET.md
+│  ├─ minimal_dataset/
+│  │  ├─ features.csv
+│  │  ├─ labels.csv
+│  │  └─ splits/{train_ids.txt,val_ids.txt,test_ids.txt}
+│  └─ third_party_instructions.md
+├─ models/
+│  ├─ README_MODELS.md
+│  └─ weights/
+│     ├─ wcp_LSTM_model_fs_model.h5
+│     ├─ rc_LSTM_model_fs_model.h5
+│     └─ ghc_mlp_model_fs_model.h5
+├─ notebooks/
+│  ├─ 01_feature_importance.ipynb
+│  ├─ 02_eval_curves.ipynb
+│  └─ 03_figures_for_paper.ipynb
+├─ scripts/
+│  ├─ load_config_and_init_model.py
+│  ├─ train.py
+│  ├─ evaluate.py
+│  ├─ find_checkpoint.py
+│  ├─ preprocess.py
+│  ├─ eval_metrics.py
+│  └─ reproduce_figures.py
+├─ figures/
+│  ├─ Fig1_workflow.svg
+│  ├─ Fig2_architecture.svg
+│  └─ FigX_results_300dpi.png
+└─ results/
+   ├─ logs/
+   └─ metrics/
+
+⚙️ Prerequisites
+
+Python 3.10+
+
+Conda
+ (recommended) or venv
+
+NVIDIA GPU + CUDA (optional but recommended)
+
+Install with Conda
+
+conda env create -f environment.yml
+conda activate aacsg_env
+
+
+Or with pip
+
+python -m venv .venv
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+# Linux/Mac
+source .venv/bin/activate
+
+pip install -r requirements.txt
+
+
+If requirements.txt/environment.yml isn’t provided yet:
+
+pip install pyyaml stable-baselines3[extra] gymnasium torch tensorflow pandas numpy scikit-learn matplotlib
+
+📊 Data & Models
+
+Minimal dataset (already included):
+
+data/minimal_dataset/features.csv
+
+data/minimal_dataset/labels.csv
+
+data/minimal_dataset/splits/train_ids.txt, val_ids.txt, test_ids.txt
+
+Weather file (e.g., data/minimal_dataset/weather_fill_missing_values.csv)
+
+Pretrained estimators:
+
+wcp_LSTM_model_fs_model.h5 (crop)
+
+rc_LSTM_model_fs_model.h5 (resources)
+
+ghc_mlp_model_fs_model.h5 (climate)
+
+Ensure configs/paper.yaml -> paths points to these files.
+
+🎯 Reward & Algorithms
+
+Reward functions and hyperparameters are defined in configs/paper.yaml.
+
+Reward profiles:
+
+equal_weights_v1 (active; α=1, β=1, extras enabled)
+
+yield_priority_v1 (alternative for sensitivity)
+
+Supported algorithms:
+
+TD3, PPO, SAC, DDPG
+
+🚀 Quick Start
+A) Training (auto-resume enabled)
+# TD3 (80k steps, auto-resume latest checkpoint)
+python scripts/train.py --algo td3 --total_timesteps 80000 --deterministic_eval
+
+# PPO / SAC / DDPG
+python scripts/train.py --algo ppo --total_timesteps 50000
+python scripts/train.py --algo sac --total_timesteps 50000
+python scripts/train.py --algo ddpg --total_timesteps 50000
+
+
+Checkpoints & logs are stored in:
+
+TD3_logs_fs/, PPO_logs/, SAC_logs/, DDPG_logs/
+
+B) Evaluation (auto-best & auto-latest)
+# Best model if available
+python scripts/evaluate.py --algo td3 --auto_best --deterministic
+
+# Best model else latest checkpoint
+python scripts/evaluate.py --algo td3 --auto_best --auto_latest --deterministic
+
+# Specific model file
+python scripts/evaluate.py --algo ppo --model_path PPO_logs/ppo_final_model.zip --episodes 20
+
+
+Save per-episode rewards:
+
+python scripts/evaluate.py --algo td3 --auto_best --save_csv results/td3_eval_rewards.csv
+
+📈 Reproduce Figures & Tables
+
+Recreate paper figures:
+
+python scripts/reproduce_figures.py \
+  --config configs/paper.yaml \
+  --data_dir data/minimal_dataset \
+  --out_dir figures
+
+
+Outputs .png (≥300 dpi) and .svg in figures/.
+
+Tables for LSTM/MLP architectures are already included in the manuscript.
+
+🔬 Sensitivity Analysis
+
+Without retraining:
+
+Switch between equal_weights_v1 and yield_priority_v1 in configs/paper.yaml.
+
+Analyze logs to plot:
+
+Reward vs. (α, β) weights
+
+Resource use vs. yield (Pareto-style scatter)
+
+Add plotting snippets in scripts/eval_metrics.py.
+
+🖥️ (Optional) One-click helpers (Windows)
+
+Create tools/train_td3.ps1:
+
+param([int]$steps = 80000)
+python scripts/train.py --algo td3 --total_timesteps $steps --deterministic_eval
+
+
+Run:
+
+powershell -ExecutionPolicy Bypass -File tools/train_td3.ps1 -steps 120000
+
+🛠️ Troubleshooting
+
+Models not found: Check configs/paper.yaml -> paths.
+
+Gym API errors: Ensure gymnasium + stable-baselines3 are compatible.
+
+Torch/TF GPU conflicts: Match CUDA/cuDNN versions; fallback to CPU if needed.
+
+Weather shape error: Env expects 10 columns. Adjust preprocessing or env definition.
+
+📜 Citation
+@article{Hindi2025AACSGH,
+  title={Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques},
+  author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and ...},
+  journal={PLOS ONE},
+  year={2025},
+  doi={10.5281/zenodo.XXXXXXX}
+}
+
+📜 License
+
+Code: MIT
+
+Data: CC BY 4.0

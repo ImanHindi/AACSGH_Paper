@@ -1,0 +1,208 @@
+# AACSGH_Paper
+Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques
+
+This repository contains the minimal dataset, code, and instructions to reproduce the results presented in our manuscript:
+
+> Hindi, I., Alsharkawi, A., Al Ajlouni, M., et al. (2025). Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques. *PLOS ONE*.  
+
+## 📂 Repository Structure
+AACSGH_Paper/
+├── configs/ # Config files (hyperparameters, settings)
+├── data/ # Minimal dataset and instructions
+│ ├── minimal_dataset/ # Features, labels, and splits
+│ └── third_party_instructions.md
+├── models/ # Model weights and documentation
+├── notebooks/ # Jupyter notebooks (analysis & figures)
+├── scripts/ # Preprocessing, training, evaluation scripts
+├── figures/ # Figures used in the paper (≥300 dpi)
+└── results/ # Logs and metrics
+
+
+## 🚀 Quick Start
+1. Clone the repository:
+   git clone https://github.com/ImanHindi/AACSGH_Paper.git
+   cd AACSGH_Paper
+
+2. Install dependencies:
+
+conda env create -f environment.yml
+conda activate aacsg_env
+
+3. Reproduce figures:
+python scripts/reproduce_figures.py --config configs/paper.yaml \
+    --data_dir data/minimal_dataset \
+    --out_dir figures
+
+📊 Data
+
+The minimal dataset (CSV + splits) required to replicate study findings is included in data/minimal_dataset/.
+
+For restricted or third-party data, see data/third_party_instructions.md.
+
+🤖 Models
+
+Model weights are stored in models/weights/.
+
+If large, we provide DOIs to Zenodo records instead of uploading here.
+
+🔬 Citation
+
+If you use this repository, please cite:
+
+@article{Hindi2025AACSGH,
+  title={Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques},
+  author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and ...},
+  journal={PLOS ONE},
+  year={2025},
+  doi={10.5281/zenodo.XXXXXXX}
+}
+
+📜 License
+
+Code: MIT License
+
+Data: CC BY 4.0
+
+
+
+## 🧪 Reproducibility Tutorial
+
+This repository is designed to enable full transparency and reproducibility of the results reported in our manuscript. Follow the instructions below to set up the environment, prepare the data, and replicate the main experiments, figures, and tables.
+
+### 1. Environment Setup
+We recommend using [Conda](https://docs.conda.io/en/latest/).  
+
+```bash
+# Clone the repository
+git clone https://github.com/<username>/AACSGH_Paper.git
+cd AACSGH_Paper
+
+# Create and activate environment
+conda env create -f environment.yml
+conda activate aacsg_env
+```
+
+Alternatively, you may install dependencies with `pip` using the provided `requirements.txt`.
+
+---
+
+### 2. Data and Pretrained Models
+- **Minimal dataset**: Provided in `data/minimal_dataset/` (features, labels, and splits).  
+- **Pretrained estimators**: Located in `models/weights/`:
+  - `wcp_LSTM_model_fs_model.h5` (crop parameter estimator)  
+  - `rc_LSTM_model_fs_model.h5` (resource consumption estimator)  
+  - `ghc_mlp_model_fs_model.h5` (greenhouse climate estimator)  
+- **Third-party/restricted data**: Instructions available in `data/third_party_instructions.md`.
+
+Ensure paths in `configs/paper.yaml` point to the correct files.
+
+---
+
+### 3. Training Reinforcement Learning Agents
+We provide unified training scripts for **TD3, PPO, SAC, and DDPG**.  
+
+Example (TD3, 80k steps):
+```bash
+python scripts/train.py --algo td3 --total_timesteps 80000 --deterministic_eval
+```
+
+Other algorithms:
+```bash
+python scripts/train.py --algo ppo --total_timesteps 50000
+python scripts/train.py --algo sac --total_timesteps 50000
+python scripts/train.py --algo ddpg --total_timesteps 50000
+```
+
+Logs, checkpoints, and best models are saved automatically under:
+- `TD3_logs_fs/`, `PPO_logs/`, `SAC_logs/`, `DDPG_logs/`
+
+The training script supports **auto-resume** from the latest checkpoint.
+
+---
+
+### 4. Evaluating Models
+To evaluate a trained model:
+
+```bash
+# Evaluate best model (if available)
+python scripts/evaluate.py --algo td3 --auto_best --deterministic
+
+# Evaluate best model or fallback to latest checkpoint
+python scripts/evaluate.py --algo td3 --auto_best --auto_latest --deterministic
+
+# Evaluate a specific saved model
+python scripts/evaluate.py --algo ppo --model_path PPO_logs/ppo_final_model.zip --episodes 20
+```
+
+Optionally export per-episode rewards to CSV:
+```bash
+python scripts/evaluate.py --algo td3 --auto_best --save_csv results/td3_eval_rewards.csv
+```
+
+---
+
+### 5. Reproducing Figures and Tables
+To regenerate paper figures:
+```bash
+python scripts/reproduce_figures.py   --config configs/paper.yaml   --data_dir data/minimal_dataset   --out_dir figures
+```
+
+Tables describing model architectures (LSTM/MLP) are provided in the manuscript and can be regenerated by extending `scripts/eval_metrics.py`.
+
+---
+
+### 6. How to Reproduce Reward Sensitivity Figures
+
+1. **Evaluate trained agent** (generate metrics):
+   ```bash
+   python scripts/eval_and_log.py \
+       --config configs/paper.yaml \
+       --algo td3 \
+       --episodes 20 \
+       --model_path models/weights/TD3_greenhouse_final_model.zip \
+       --out results/metrics/weekly_metrics.csv
+
+2. **Generate Pareto plot** (Yield vs Resource):
+
+python scripts/plot_reward_profiles.py \
+    --config configs/paper.yaml \
+    --metrics_csv results/metrics/weekly_metrics.csv \
+    --out figures/RewardPareto.png
+3. **Generate Reward Sensitivity Heatmap:**
+
+python scripts/plot_reward_profiles.py \
+    --config configs/paper.yaml \
+    --metrics_csv results/metrics/weekly_metrics.csv \
+    --out figures/RewardSensitivity.png \
+    --alpha_grid 0.2 1.5 50 \
+    --beta_grid 0.2 1.5 50
+
+The two figures will be saved in figures/:
+* RewardPareto.png → Pareto frontier of yield vs. resource
+* RewardSensitivity.png → Heatmap of reward response to α and β
+This allows exploration of trade-offs between yield and resource efficiency without retraining.
+
+---
+## 🧭 Tutorial
+See **[docs/TUTORIAL.md](docs/TUTORIAL.md)** for a step-by-step guide to reproduce results.
+Quick launchers:
+- Linux/Mac: `scripts/tutorial_quickstart.sh`
+- Windows PowerShell: `scripts/tutorial_quickstart.ps1`
+
+---
+### 7. Data Availability & Citation
+All minimal data and scripts necessary to reproduce results are included here. Additional logs and artifacts are archived on Zenodo (DOI in Data Availability Statement).  
+
+If you use this repository, please cite:
+
+```bibtex
+@article{Hindi2025AACSGH,
+  title={Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques},
+  author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and ...},
+  journal={PLOS ONE},
+  year={2025},
+  doi={10.5281/zenodo.XXXXXXX}
+}
+```
+
+---
