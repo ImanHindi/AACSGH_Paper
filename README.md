@@ -6,17 +6,18 @@ This repository contains the minimal dataset, code, and instructions to reproduc
 > Hindi, I., Alsharkawi, A., Al Ajlouni, M., et al. (2025). Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques. *PLOS ONE*.  
 
 ## 📂 Repository Structure
-AACSGH_Paper/ \n
-├── configs/ # Config files (hyperparameters, settings) \n
-├── data/ # Minimal dataset and instructions \n
-│ ├── minimal_dataset/ # Features, labels, and splits \n
-│ └── third_party_instructions.md \n
-├── models/ # Model weights and documentation \n
-├── notebooks/ # Jupyter notebooks (analysis & figures) \n
-├── scripts/ # Preprocessing, training, evaluation scripts \n
-├── figures/ # Figures used in the paper (≥300 dpi) \n
-└── results/ # Logs and metrics \n
-
+```
+AACSGH_Paper/
+├── configs/ # Config files (hyperparameters, settings)
+├── data/ # Minimal dataset and instructions
+│ ├── minimal_dataset/ # Features, labels, and splits
+│ └── third_party_instructions.md
+├── models/ # Model weights and documentation
+├── notebooks/ # Jupyter notebooks (analysis & figures)
+├── scripts/ # Preprocessing, training, evaluation scripts
+├── figures/ # Figures used in the paper (≥300 dpi)
+└── results/ # Logs and metrics
+```
 
 ## 🚀 Quick Start
 1. Clone the repository:
