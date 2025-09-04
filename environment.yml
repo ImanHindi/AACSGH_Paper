@@ -1,4 +1,4 @@
-name: samah
+name: AACSGH_ENV
 channels:
   - conda-forge
   - defaults
@@ -433,5 +433,5 @@ dependencies:
       - urllib3==1.26.19
       - wikipedia-api==0.6.0
       - wrapt==1.14.1
-prefix: /home/ai-ws2/anaconda3/envs/samah
+prefix: /home/ai-ws2/anaconda3/envs/AACSGH_ENV
  

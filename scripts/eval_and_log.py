@@ -7,7 +7,7 @@
 # python scripts\eval_and_log.py ^
 #   --config configs\paper.yaml ^
 #   --algo td3 ^
-#   --model_path path\to\your_trained_TD3_model.zip ^
+#   --model_path .\models\weights\TD3_greenhouse_final_model.zip ^
 #   --episodes 20 ^
 #   --out results\metrics\weekly_metrics.csv
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     # Build ONLY the env (no model here)
     cfg = load_yaml_config(args.config)
-    env = make_env_from_config(cfg, algo_name=args.algo)  # your updated function that accepts algo_name
+    env = make_env_from_config(cfg, algo_name=args.algo)  # updated function that accepts algo_name
 
 
     # cast observations to float32 recursively (works for Dict/Tuple/Box)
@@ -106,24 +106,6 @@ if __name__ == "__main__":
     # now attach env (SB3 will build a small buffer using overridden values)
     model.set_env(env)
 
-
-    # # Define the path to the best model directory
-    # best_model_dir = r'C:\Users\Iman.Hindi\Desktop\AACSGH_Paper\models\weights'
-
-    # # Check if the best model file exists
-    # best_model_filename = 'TD3_greenhouse_final_model.zip'  # Change this to your actual best model filename if different
-    # best_model_path = os.path.join(best_model_dir, best_model_filename)
-
-    # # Load the best model
-    # if os.path.exists(best_model_path):
-    #     print(f"Loading the best model from {best_model_path}")
-    #     best_model = TD3.load(best_model_path, env=env)
-    # else:
-    #     raise FileNotFoundError(f"No best model found at {best_model_path}")
-
-
-    # Load trained TD3 WITHOUT env to avoid buffer allocation
-    # model = TD3.load(args.model_path, env=env)  # or "cuda" if available; no env passed
 
     df = run_episodes(env, model, n_episodes=args.episodes)
     os.makedirs(os.path.dirname(args.out), exist_ok=True)

@@ -29,7 +29,7 @@ def _get_active_reward_profile(cfg: Dict[str, Any]) -> Dict[str, Any]:
 # ----------------------
 class GreenhouseEnv(gym.Env):
     """
-    Minimal version consistent with your code snippet.
+    Minimal version.
     Loads pre-trained estimators and uses weather data to create observations.
     """
     metadata = {"render_modes": []}
@@ -84,7 +84,7 @@ class GreenhouseEnv(gym.Env):
 
         self.th = rcfg.get("thresholds", {}) or {}
         self.ex = rcfg.get("extras", {}) or {}
-        # Observations: as in your snippet
+        # Observations: 
         self.observation_space = spaces.Dict({
             "weather": spaces.Box(low=0, high=1, shape=(2016, 10), dtype=np.float32),
             "crop_params": spaces.Box(low=0, high=1, shape=(1, 3), dtype=np.float32),
@@ -102,7 +102,7 @@ class GreenhouseEnv(gym.Env):
         self.state = None
         self.daily_res_cons = None
 
-        # Column lists (align with your code; adapt as needed)
+        # Column lists 
         self.actions_sp = [
             "co2_vip",
             "int_white_vip",
@@ -284,7 +284,7 @@ class GreenhouseEnv(gym.Env):
             or np.any(weekly_crop_params[0] < 0.2)
             or np.any(weekly_resource_consumption[0] > 7.0)
             or np.all(weekly_crop_params[0] < 0.5)
-            # or high_rc   # (original had this commented)
+              
         )
         truncated = done
         info = {}
@@ -292,7 +292,7 @@ class GreenhouseEnv(gym.Env):
 
     def calculate_reward(self, crop_params: np.ndarray, resource_consumption: np.ndarray, current_actions: np.ndarray) -> float:
         # crop_params: shape (3,)
-        # resource_consumption: shape (5,) -> we use [heat, co2, elecHi, elecLow, irr] aggregated into 4 slots as in your code
+        # resource_consumption: shape (5,) -> we use [heat, co2, elecHi, elecLow, irr] aggregated into 4 slots 
         # current_actions: shape (2016, action_count)
 
         # Crop reward (weighted normalized sum)
@@ -300,7 +300,7 @@ class GreenhouseEnv(gym.Env):
         crop_norm   = np.divide(crop_params, self.crop_mv, out=np.zeros_like(crop_params), where=self.crop_mv!=0.0)
         crop_reward = float(np.sum(self.crop_w * crop_norm))
 
-        # Resource penalty (heat, co2, elec_hi+elec_low, irr) -> map your 5 to 4 slots
+        # Resource penalty (heat, co2, elec_hi+elec_low, irr) 
         r = np.array(resource_consumption, dtype=float).reshape(-1)  # (5,)
         elec_sum = r[2] + r[3] if r.size >= 4 else 0.0
         res_vec4 = np.array([r[0], r[1], elec_sum, r[4]], dtype=float)   # (4,)

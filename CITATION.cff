@@ -5,17 +5,17 @@ type: software
 authors:
   - family-names: "Hindi"
     given-names: "Iman"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0009-0008-0069-1944"
   - family-names: "Alsharkawi"
     given-names: "Adham"
   - family-names: "Al Ajlouni"
     given-names: "Malek"
-repository-code: "https://github.com/<username>/AACSGH_Paper"
+repository-code: "https://github.com/ImanHindi/AACSGH_Paper"
 license: MIT
 keywords:
   - reinforcement learning
   - TD3
   - greenhouse control
   - sustainable agriculture
-doi: "10.5281/zenodo.XXXXXXX"
+doi: "10.5281/zenodo.17043199"
  

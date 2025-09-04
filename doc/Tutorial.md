@@ -78,7 +78,7 @@ pip install pyyaml stable-baselines3[extra] gymnasium torch tensorflow pandas nu
 
 📊 Data & Models
 
-Minimal dataset (already included):
+Minimal dataset (DOI: 10.5281/zenodo.17043199)(already included):
 
 data/minimal_dataset/features.csv
 
@@ -123,7 +123,7 @@ python scripts/train.py --algo sac --total_timesteps 50000
 python scripts/train.py --algo ddpg --total_timesteps 50000
 
 
-Checkpoints & logs are stored in:
+Checkpoints & logs are stored inside Models folder:
 
 TD3_logs_fs/, PPO_logs/, SAC_logs/, DDPG_logs/
 
@@ -146,15 +146,20 @@ python scripts/evaluate.py --algo td3 --auto_best --save_csv results/td3_eval_re
 
 Recreate paper figures:
 
-python scripts/reproduce_figures.py \
-  --config configs/paper.yaml \
-  --data_dir data/minimal_dataset \
-  --out_dir figures
+```bash
+python scripts/reproduce_figures.py --config configs/paper.yaml --out_dir figures
 
 
 Outputs .png (≥300 dpi) and .svg in figures/.
 
 Tables for LSTM/MLP architectures are already included in the manuscript.
+# Example (adjust paths to actual filenames)
+python scripts/eval_metrics.py \
+  --crop_model models/weights/wcp_LSTM_model_fs_model.h5 \
+  --rc_model   models/weights/rc_LSTM_model_fs_model.h5 \
+  --ghc_model  models/weights/ghc_mlp_model_fs_model.h5 \
+  --out results/metrics/model_architectures.md
+
 
 🔬 Sensitivity Analysis
 
@@ -198,7 +203,7 @@ Weather shape error: Env expects 10 columns. Adjust preprocessing or env definit
   author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and ...},
   journal={PLOS ONE},
   year={2025},
-  doi={10.5281/zenodo.XXXXXXX}
+  doi={10.5281/zenodo.17043199}
 }
 
 📜 License
