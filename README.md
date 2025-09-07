@@ -3,7 +3,7 @@ Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable 
 
 This repository contains the minimal dataset, code, and instructions to reproduce the results presented in our manuscript:
 
-> Hindi, I., Alsharkawi, A., Al Ajlouni, M., et al. (2025). Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques. *PLOS ONE*.  
+> Hindi, I., Alsharkawi, A., Al Ajlouni, M., Qarallah, B. (2025). Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques. *PLOS ONE*.  
 
 ## 📂 Repository Structure
 ```
@@ -51,7 +51,7 @@ If you use this repository, please cite:
 
 @article{Hindi2025AACSGH,
   title={Enhancing Autonomous Agriculture Control Systems in Greenhouses for Sustainable Resource Usage Using Deep Learning Techniques},
-  author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and ...},
+  author={Hindi, Iman and Alsharkawi, Adham and Al Ajlouni, Malek and Qarallah, Bassam},
   journal={PLOS ONE},
   year={2025},
   doi={10.5281/zenodo.17043199}

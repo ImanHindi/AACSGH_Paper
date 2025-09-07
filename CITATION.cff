@@ -10,6 +10,8 @@ authors:
     given-names: "Adham"
   - family-names: "Al Ajlouni"
     given-names: "Malek"
+  - family-names: "Qarallah"
+    given-names: "Bassam"
 repository-code: "https://github.com/ImanHindi/AACSGH_Paper"
 license: MIT
 keywords:
